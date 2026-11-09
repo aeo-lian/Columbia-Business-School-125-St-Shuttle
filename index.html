@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>125 St Shuttle</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one-thumb phone screen — day switch, giant next-departure card, a short "then" list, one route line */
+:root{
+  --bg:#eef1f5; --card:#ffffff; --fg:#121821; --muted:#667080; --line:#dfe4eb;
+  --accent:#1d4f91; --accent-fg:#ffffff; --one:#d82c24;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0d1117; --card:#171e28; --fg:#eef2f7; --muted:#97a2b2; --line:#283240;
+  --accent:#6ea6ee; --accent-fg:#0d1117; --one:#ff6a5f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1117; --card:#171e28; --fg:#eef2f7; --muted:#97a2b2; --line:#283240;
+  --accent:#6ea6ee; --accent-fg:#0d1117; --one:#ff6a5f; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 32px}
+.wrap{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+p{margin:0}
+button{font-family:var(--body);cursor:pointer}
+button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.brand{font:700 1.35rem/1 var(--display);letter-spacing:.02em;display:flex;align-items:center;gap:8px}
+.bullet{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--one);color:#fff;font:700 .8rem var(--body)}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:3px}
+.seg button{border:0;background:none;color:var(--muted);font-weight:600;font-size:.85rem;padding:7px 14px;border-radius:99px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg)}
+
+.hero{background:var(--accent);color:var(--accent-fg);border-radius:20px;padding:20px 20px 18px;display:flex;flex-direction:column;gap:4px}
+.hero .lbl{font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;opacity:.8}
+.hero .big{font:700 4.2rem/1 var(--display);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.hero .big small{font-size:1.6rem;margin-left:4px}
+.hero .sub{font-weight:600;font-size:1.05rem;font-variant-numeric:tabular-nums}
+.hero .sub2{font-size:.9rem;opacity:.85}
+
+.list{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.row{display:flex;justify-content:space-between;align-items:baseline;padding:13px 16px;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.row:first-child{border-top:0}
+.row .time{font:700 1.4rem/1 var(--display)}
+.row .in{color:var(--muted);font-size:.9rem;font-weight:500}
+.more{width:100%;border:0;border-top:1px solid var(--line);background:none;color:var(--accent);font-weight:700;font-size:.95rem;padding:14px}
+.earlier{border-top:0;border-bottom:1px solid var(--line)}
+.row.past{opacity:.5}
+
+.route{display:flex;flex-direction:column;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.step{display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:center;font-size:.92rem}
+.step .n{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--accent-fg);font:700 .72rem var(--body)}
+.step .n.train{background:var(--one);color:#fff}
+.step b{font-weight:600}
+.step a{color:var(--accent);font-weight:600;font-size:.85rem;text-decoration:none}
+.foot{font-size:.78rem;color:var(--muted);text-align:center}
+.foot a{color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="top">
+    <div class="brand"><span class="bullet">1</span>125 St Shuttle</div>
+    <div class="seg" role="group" aria-label="Schedule day">
+      <button id="d-wk" type="button" data-day="wk">Weekday</button>
+      <button id="d-sat" type="button" data-day="sat">Sat</button>
+    </div>
+  </div>
+
+  <section class="hero" aria-live="polite">
+    <p class="lbl" id="hLbl">Next shuttle</p>
+    <p class="big" id="hBig">—</p>
+    <p class="sub" id="hSub"></p>
+    <p class="sub2" id="hSub2"></p>
+  </section>
+
+  <section class="list" aria-label="Upcoming departures">
+    <button class="more earlier" id="earlier" type="button">Show earlier times</button>
+    <div id="rows"></div>
+    <button class="more" id="more" type="button">Show later times</button>
+  </section>
+
+  <section class="route" id="route" aria-label="How to ride"></section>
+
+  <p class="foot">Columbia ID required · Schedule from <a href="https://transportation.columbia.edu/content/125-street-station-shuttle-schedule" target="_blank" rel="noopener">Columbia Transportation</a>, Nov 9. Live buses in TripShot.</p>
+</div>
+
+<script>
+const parse = s => s.split(" ").map(x=>x.split("|"));
+const SCHED = {
+  wk:{ from:"Forum S", to:"116 St", ends:"9:44 PM", days:"Mon–Fri",
+    rows:parse("4:30|4:34 4:37|4:41 4:45|4:49 4:52|4:56 5:00|5:04 5:07|5:11 5:15|5:19 5:22|5:26 5:30|5:34 5:37|5:41 5:45|5:49 5:52|5:56 6:00|6:04 6:07|6:11 6:15|6:19 6:22|6:26 6:30|6:34 6:37|6:41 6:45|6:49 6:52|6:56 7:35|7:39 7:40|7:44 7:50|7:54 7:55|7:59 8:05|8:09 8:10|8:14 8:20|8:24 8:25|8:29 8:35|8:39 8:40|8:44 8:50|8:54 8:55|8:59 9:05|9:09 9:10|9:14 9:20|9:24 9:25|9:29 9:35|9:39 9:40|9:44"),
+    route:[
+      ["1","<b>Board at Forum S</b><br>Broadway & W 129 St (M4 bus stop)","3219 Broadway, New York, NY"],
+      ["2","<b>Get off at 116 St</b> · about 4 min","Broadway and W 116 St, New York, NY"],
+      ["1","<b>Take the downtown 1</b> from 116 St–Columbia",null,true]
+    ]},
+  sat:{ from:"Business School", to:"137 St", ends:"8:05 PM", days:"Saturday",
+    rows:parse("1:00|1:05 1:15|1:20 1:30|1:35 1:45|1:50 2:00|2:05 2:15|2:20 2:30|2:35 2:45|2:50 3:00|3:05 3:07|3:12 3:15|3:20 3:22|3:27 3:30|3:35 3:37|3:42 3:45|3:50 3:52|3:57 4:00|4:05 4:07|4:12 4:15|4:20 4:22|4:27 4:30|4:35 4:37|4:42 4:45|4:50 4:52|4:57 5:00|5:05 5:07|5:12 5:15|5:20 5:22|5:27 5:30|5:35 5:37|5:42 5:45|5:50 6:00|6:05 6:15|6:20 6:30|6:35 6:45|6:50 7:00|7:05 7:15|7:20 7:30|7:35 7:45|7:50 8:00|8:05"),
+    route:[
+      ["1","<b>Board at the Business School</b><br>2289 12th Ave, Manhattanville","2289 12th Ave, New York, NY"],
+      ["2","<b>Get off at 137 St</b> · about 5 min","3387 Broadway, New York, NY"],
+      ["1","<b>Take the downtown 1</b> (express to 96 St)",null,true]
+    ]}
+};
+const toMin = t => { const [h,m]=t.split(":").map(Number); return (h===12?12:h+12)*60+m; }; // all times are PM
+const fmt = t => t + " PM";
+const mapUrl = q => "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(q);
+
+function nyNow(){
+  const p=Object.fromEntries(new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",weekday:"short",hour:"numeric",minute:"numeric",hour12:false}).formatToParts(new Date()).map(x=>[x.type,x.value]));
+  return {wd:p.weekday, mins:(+p.hour%24)*60 + +p.minute};
+}
+const dayFor = wd => wd==="Sat"?"sat":(wd==="Sun"?null:"wk");
+const inText = m => m<=0 ? "now" : m<60 ? `in ${m} min` : `in ${Math.floor(m/60)} h ${m%60} min`;
+
+let day, shown=4, back=0;
+function render(){
+  const S=SCHED[day], now=nyNow(), live=dayFor(now.wd)===day;
+  document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.day===day));
+
+  let start = 0, done=false;
+  if (live){ start = S.rows.findIndex(r=>toMin(r[0])>=now.mins); if(start===-1){done=true;start=0;} }
+  const hLbl=document.getElementById("hLbl"),hBig=document.getElementById("hBig"),hSub=document.getElementById("hSub"),hSub2=document.getElementById("hSub2");
+
+  if (live && !done){
+    const r=S.rows[start], w=toMin(r[0])-now.mins;
+    hLbl.textContent="Next shuttle";
+    hBig.innerHTML = w<=0 ? "Now" : w<60 ? `${w}<small>min</small>` : fmt(r[0]);
+    hSub.textContent=`${fmt(r[0])} from ${S.from}`;
+    hSub2.textContent=`Arrives ${S.to} at ${fmt(r[1])}`;
+  } else {
+    hLbl.textContent = live ? "Done for today" : (now.wd==="Sun" ? "No shuttle on Sunday" : `Runs ${S.days}`);
+    hBig.textContent = fmt(S.rows[0][0]);
+    hSub.textContent = `First shuttle ${S.days==="Saturday"?"Saturday":"next weekday"} from ${S.from}`;
+    hSub2.textContent = `Last one ${S.ends}`;
+  }
+
+  const rest = S.rows.slice(live && !done ? start+1 : 1);
+  const list = rest.slice(0, shown);
+  const past = live ? (done ? S.rows : S.rows.slice(0,start)) : [];
+  const pastShown = past.slice(Math.max(0, past.length-back));
+  const earlier=document.getElementById("earlier");
+  earlier.hidden = back>=past.length;
+  const pastHtml = pastShown.map(r=>{const ago=now.mins-toMin(r[0]);return `<div class="row past"><span class="time">${fmt(r[0])}</span><span class="in">left ${ago<60?ago+" min":Math.floor(ago/60)+" h "+ago%60+" min"} ago</span></div>`;}).join("");
+  const rows=document.getElementById("rows");
+  rows.innerHTML = pastHtml + (list.length ? list.map(r=>{
+    const right = live && !done ? inText(toMin(r[0])-now.mins) : `arr. ${S.to} ${fmt(r[1])}`;
+    return `<div class="row"><span class="time">${fmt(r[0])}</span><span class="in">${right}</span></div>`;
+  }).join("") : `<div class="row"><span class="in">That's the last shuttle today.</span></div>`);
+  const more=document.getElementById("more");
+  more.hidden = shown>=rest.length;
+
+  document.getElementById("route").innerHTML = S.route.map(([n,h,q,train])=>
+    `<div class="step"><span class="n${train?" train":""}">${n}</span><span>${h}</span>${q?`<a href="${mapUrl(q)}" target="_blank" rel="noopener">Map</a>`:"<span></span>"}</div>`).join("");
+}
+
+document.querySelectorAll(".seg button").forEach(b=>b.addEventListener("click",()=>{day=b.dataset.day;shown=4;back=0;render();}));
+document.getElementById("earlier").addEventListener("click",()=>{back+=4;render();});
+document.getElementById("more").addEventListener("click",()=>{shown+=6;render();});
+day = dayFor(nyNow().wd) || "wk";
+render();
+setInterval(render,30000);
+</script>
+</body>
+</html>
