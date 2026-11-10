@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-4GaFLPtQhaF2YXJbydhDGgQi0X1iBTd29tw86osAM+M=' 'sha256-HbTghupQiBoy4jefMBgC/Rl9jstHrzVwWRm4dh6JZPU=' 'sha256-d24N/AihfsCGvdcc2nljgFTXn1b8e7rmQqxqi9CjrAU='; style-src 'sha256-ZYyYzIdz42vx+yqXpcgsiEtaJXg8dqr8avbmFaNqZj8=' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; manifest-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-4GaFLPtQhaF2YXJbydhDGgQi0X1iBTd29tw86osAM+M=' 'sha256-eLaunzxGEmfKQdj6MSFGTkWBzrRKVjGXedSbMQOWD0U=' 'sha256-aOV+5zoQKMoapnFfwZ2aW8hhbgbxLy0nS4AiH8uKDow='; style-src 'sha256-CQnn1av6OeyXM5Mk5MyHdNe9o5F5FP/k01Wvj7C0dxw=' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; manifest-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <title>125 St Shuttle</title>
 <meta name="description" content="Next departure for Columbia's temporary 125 St shuttle">
@@ -118,6 +118,24 @@ details pre{white-space:pre-wrap;word-break:break-word;background:var(--bg);bord
 textarea[aria-invalid="true"]{border-color:var(--one)}
 .is-off{opacity:.45}
 .tertiary{border:0;background:none;color:var(--accent);font-weight:700;font-size:.95rem;padding:8px}
+/* Chinese: PingFang SC on Apple devices, Noto Sans SC elsewhere (loaded only when Chinese is chosen).
+   Latin digits keep the condensed display face so times still line up. */
+:root:lang(zh-Hans){
+  --cjk:"PingFang SC","Noto Sans SC","Noto Sans CJK SC","Hiragino Sans GB","Source Han Sans SC","Microsoft YaHei",sans-serif;
+  --display:"Barlow Condensed",var(--cjk);
+  --body:"Public Sans",var(--cjk);
+}
+:lang(zh-Hans) body{line-height:1.6;letter-spacing:.01em}
+:lang(zh-Hans) .hero .lbl,:lang(zh-Hans) .sheet h3,:lang(zh-Hans) .row.daylabel{letter-spacing:.12em;text-transform:none;font-weight:500}
+:lang(zh-Hans) .brand{font-family:var(--cjk);font-weight:600;font-size:1.2rem;letter-spacing:.02em}
+:lang(zh-Hans) .hero .big small{font-family:var(--cjk);font-weight:500;font-size:1.3rem;margin-left:6px}
+:lang(zh-Hans) .hero .big.word{font-family:var(--cjk);font-weight:600;font-size:2.4rem;letter-spacing:.02em}
+:lang(zh-Hans) .hero .sub{font-weight:500}
+:lang(zh-Hans) .sheet h2{font-family:var(--cjk);font-weight:600;font-size:1.5rem;letter-spacing:.02em}
+:lang(zh-Hans) .seg button,:lang(zh-Hans) .more,:lang(zh-Hans) .primary,:lang(zh-Hans) .secondary,:lang(zh-Hans) .tertiary,:lang(zh-Hans) .linkbtn{font-weight:500;letter-spacing:.04em}
+:lang(zh-Hans) .step b,:lang(zh-Hans) .tips b,:lang(zh-Hans) .howto b{font-weight:600}
+.ampm{font-family:var(--body);font-size:.62em;font-weight:500;color:var(--muted);margin-right:3px;vertical-align:.12em}
+.hero .ampm{color:inherit;opacity:.8}
 </style>
 </head>
 <body>
@@ -415,47 +433,88 @@ const ShuttleI18n = (() => {
       errCheck: "Consulta {link} y toca “Avísale a Lian” abajo."
     },
     zh: {
-      appName: "125街接驳车", weekday: "工作日", sat: "周六", helpAria: "使用说明", scheduleAria: "时刻表",
-      nextShuttle: "下一班", min: "分钟", now: "现在",
-      fromStop: "{time} 从{stop}出发", arrives: "{time} 到达{stop}",
-      ended: "临时接驳车已停运", endedWord: "已停运", notYet: "尚未开始运行", soon: "即将",
-      lastDay: "最后一个运行日是{date}。", checkUpdates: "请查看{link}了解最新信息。", check: "请查看{link}。",
-      linkName: "哥大交通处", siteName: "哥大网站",
-      closedToday: "今天停运 · {reason}", done: "今天已结束", runsSat: "周六运行", runsWk: "工作日运行",
-      tomorrow: "明天", nextOn: "下一班：{date}", leavesFrom: "从{stop}出发", none: "无", noMore: "没有更多班次",
-      staleNote: "时刻表最后核对于{date}。请到{link}再次确认。",
-      endingNote: "此时刻表有效期至{date}，之后哥大可能会调整。",
-      showEarlier: "查看更早班次", showLater: "查看更晚班次",
-      leftAgo: "{d}前已出发", left: "已出发", inMin: "{m}分钟后", inHM: "{h}小时{m}分钟后", durMin: "{m}分钟", durHM: "{h}小时{m}分钟",
-      lastToday: "这是今天的最后一班。", arrivesShort: "{time} 到达{stop}",
-      boardAt: "在{stop}上车", getOff: "在{stop}下车", aboutMin: "约{m}分钟", map: "地图",
-      reportOpen: "发现问题？告诉Lian",
-      footer: "需出示哥大学生/员工证 · 学校假日停运 · 时刻表于{date}与{link}核对",
+      appName: "125街校车",
+      weekday: "工作日",
+      sat: "周六",
+      helpAria: "使用说明",
+      scheduleAria: "时刻表",
+      nextShuttle: "下一班车",
+      min: "分钟",
+      now: "马上发车",
+      fromStop: "{time}从{stop}发车",
+      arrives: "{time}到{stop}",
+      ended: "临时校车已停运",
+      endedWord: "已停运",
+      notYet: "还没开始运行",
+      soon: "即将开通",
+      lastDay: "已于{date}结束运行。",
+      checkUpdates: "最新安排请看{link}。",
+      check: "请看{link}。",
+      linkName: "哥大交通官网",
+      siteName: "哥大官网",
+      closedToday: "今天停运（{reason}）",
+      done: "今天的车已经开完了",
+      runsSat: "只在周六运行",
+      runsWk: "只在工作日运行",
+      tomorrow: "明天",
+      nextOn: "下一班：{date}",
+      leavesFrom: "{stop}发车",
+      none: "暂无",
+      noMore: "后面没有车了",
+      staleNote: "时刻表最后一次核对是{date}，出发前建议到{link}再确认一下。",
+      endingNote: "这套时刻表用到{date}，之后学校可能会调整。",
+      showEarlier: "看看前面的班次",
+      showLater: "看看后面的班次",
+      leftAgo: "{d}前开走了",
+      left: "已开走",
+      inMin: "还有{m}分钟",
+      inHM: "还有{h}小时{m}分钟",
+      durMin: "{m}分钟",
+      durHM: "{h}小时{m}分钟",
+      lastToday: "这是今天最后一班。",
+      arrivesShort: "{time}到{stop}",
+      boardAt: "在{stop}上车",
+      getOff: "在{stop}下车",
+      aboutMin: "大约{m}分钟",
+      map: "地图",
+      reportOpen: "时间不对？告诉Lian",
+      footer: "凭哥大证件乘车 · 学校假日停运 · 时刻表已于{date}与{link}核对",
       language: "语言",
-      helpTitle: "接驳车App使用说明",
-      tip1: "蓝色卡片显示<b>下一班车</b>以及还有几分钟发车。",
-      tip2: "可在<b>工作日</b>和<b>周六</b>之间切换，两者上车地点不同。",
-      tip3: "点<b>查看更早班次</b>或<b>查看更晚班次</b>可看到更多班次。",
-      tip4: "最下面的卡片显示上车地点，点<b>地图</b>查看路线。",
-      saveTitle: "添加到主屏幕", iphone: "iPhone", android: "安卓", computer: "电脑", deviceAria: "你的设备",
-      howIos: "<ol><li>用 <b>Safari</b> 打开本页面。</li><li>点<b>分享</b>按钮（带箭头的方框）。</li><li>向下滑动，点<b>添加到主屏幕</b>，再点<b>添加</b>。</li></ol>",
-      howAndroid: "<ol><li>用 <b>Chrome</b> 打开本页面。</li><li>点右上角的 <b>⋮</b> 菜单。</li><li>点<b>添加到主屏幕</b>，再点<b>添加</b>。</li></ol>",
-      howDesktop: "<ol><li>在 Chrome 或 Edge 中，点击地址栏右侧的<b>安装图标</b>（如果有）。</li><li>或添加书签：Mac 按 <b>⌘D</b>，Windows 按 <b>Ctrl+D</b>。</li></ol>",
-      installedNote: "✓ 已添加到主屏幕，随时从主屏幕打开即可。",
-      gotIt: "知道了",
+      helpTitle: "怎么用",
+      tip1: "蓝色卡片会显示<b>下一班车</b>，还有几分钟发车一目了然。",
+      tip2: "顶部可以切换<b>工作日</b>和<b>周六</b>，两种情况上车地点不一样。",
+      tip3: "点<b>看看前面的班次</b>或<b>看看后面的班次</b>，可以查看更多时间。",
+      tip4: "最下面告诉你在哪儿上车，点<b>地图</b>就能导航过去。",
+      saveTitle: "添加到手机桌面",
+      iphone: "iPhone",
+      android: "安卓",
+      computer: "电脑",
+      deviceAria: "你的设备",
+      howIos: "<ol><li>用 <b>Safari</b> 打开这个页面。</li><li>点底部的<b>分享</b>按钮（方框加向上箭头）。</li><li>往下滑，选<b>添加到主屏幕</b>，再点<b>添加</b>。</li></ol>",
+      howAndroid: "<ol><li>用 <b>Chrome</b> 打开这个页面。</li><li>点右上角的 <b>⋮</b>。</li><li>选<b>添加到主屏幕</b>，再点<b>添加</b>。</li></ol>",
+      howDesktop: "<ol><li>用 Chrome 或 Edge 打开时，地址栏右侧如果有<b>安装图标</b>，点它就行。</li><li>也可以加书签：Mac 按 <b>⌘D</b>，Windows 按 <b>Ctrl+D</b>。</li></ol>",
+      installedNote: "✓ 已经添加到桌面了，以后直接点图标打开就行。",
+      gotIt: "好的",
       reportTitle: "遇到问题了？",
-      reportIntro: "告诉Lian你预期看到什么、App实际显示了什么。系统会自动附上一些App信息，方便她修复。",
+      reportIntro: "跟Lian说说App显示的和实际情况哪里不一样。App会自动附上一些技术信息，方便她排查。",
       reportLabel: "发生了什么（必填）",
-      reportPlaceholder: "例如：显示下一班是下午6:00，但车5:55就开走了。",
-      reportDetails: "将附带的信息",
-      needText: "请先描述发生了什么（至少几个字）。",
-      sendEmail: "发邮件给Lian", sendGithub: "在GitHub上报告", copyReport: "复制报告",
-      copied: "已复制。粘贴到短信或邮件中发给Lian即可。", copyFallback: "请选中并复制上面的信息。",
-      emailOpened: "邮件App应会打开，并已填好报告内容。",
-      cancel: "取消", emailSubject: "125街接驳车App问题",
-      whatHappened: "发生了什么", details: "附带信息",
-      errTitle: "出错了", oops: "出错了", errSub: "App无法计算时刻表。",
-      errCheck: "请查看{link}，并点下方“告诉Lian”。"
+      reportPlaceholder: "比如：App显示下一班是下午6:00，但车5:55就开走了。",
+      reportDetails: "会附带的信息",
+      needText: "请先简单写一下发生了什么。",
+      sendEmail: "发邮件给Lian",
+      sendGithub: "在GitHub上反馈",
+      copyReport: "复制内容",
+      copied: "已复制，粘贴到短信或邮件里发给Lian就行。",
+      copyFallback: "请手动选中并复制上面的信息。",
+      emailOpened: "邮件App应该已经打开了，内容都帮你填好了。",
+      cancel: "取消",
+      emailSubject: "125街校车App问题反馈",
+      whatHappened: "发生了什么",
+      details: "附带信息",
+      errTitle: "出了点问题",
+      oops: "出错了",
+      errSub: "App没能算出时刻表。",
+      errCheck: "请先看{link}，再点下面的“告诉Lian”反馈一下。"
     }
   };
 
@@ -465,18 +524,18 @@ const ShuttleI18n = (() => {
     "116 St": { es: "116 St", zh: "116街" },
     "Business School": { es: "la Escuela de Negocios", zh: "商学院" },
     "137 St": { es: "137 St", zh: "137街" },
-    "Broadway & W 129 St (M4 bus stop)": { es: "Broadway y W 129 St (parada del bus M4)", zh: "百老汇大道与西129街（M4公交站）" },
-    "SW corner of Broadway & W 116 St": { es: "Esquina suroeste de Broadway y W 116 St", zh: "百老汇大道与西116街西南角" },
-    "2289 12th Ave, Manhattanville": { es: "2289 12th Ave, Manhattanville", zh: "2289 12th Ave（曼哈顿维尔校区）" },
-    "3387 Broadway, by 137 St–City College": { es: "3387 Broadway, junto a 137 St–City College", zh: "3387 Broadway，靠近137街–城市学院站" },
-    "Take the downtown 1 from 116 St–Columbia": { es: "Toma el tren 1 hacia downtown en 116 St–Columbia", zh: "在116街–哥伦比亚大学站乘坐1号线往下城方向" },
-    "Take the downtown 1 from 137 St (express to 96 St)": { es: "Toma el tren 1 hacia downtown en 137 St (expreso hasta 96 St)", zh: "在137街乘坐1号线往下城方向（快车直达96街）" },
+    "Broadway & W 129 St (M4 bus stop)": { es: "Broadway y W 129 St (parada del bus M4)", zh: "百老汇大道和西129街路口（M4公交站）" },
+    "SW corner of Broadway & W 116 St": { es: "Esquina suroeste de Broadway y W 116 St", zh: "百老汇大道和西116街路口西南角" },
+    "2289 12th Ave, Manhattanville": { es: "2289 12th Ave, Manhattanville", zh: "12大道2289号（Manhattanville校区）" },
+    "3387 Broadway, by 137 St–City College": { es: "3387 Broadway, junto a 137 St–City College", zh: "百老汇大道3387号，137街–City College地铁站旁" },
+    "Take the downtown 1 from 116 St–Columbia": { es: "Toma el tren 1 hacia downtown en 116 St–Columbia", zh: "在116街–哥大站坐1号线往下城（downtown）方向" },
+    "Take the downtown 1 from 137 St (express to 96 St)": { es: "Toma el tren 1 hacia downtown en 137 St (expreso hasta 96 St)", zh: "在137街坐1号线往下城方向（快车直达96街）" },
     "On weekdays, downtown 1 trains skip 125 St. Uptown trains still stop there.": {
       es: "Entre semana, los trenes 1 hacia downtown no paran en 125 St. Los que van hacia uptown sí paran.",
-      zh: "工作日往下城方向的1号线不停125街，往上城方向的列车照常停靠。" },
+      zh: "工作日往下城方向的1号线不停125街；往上城方向照常停靠。" },
     "On weekends, downtown 1 trains run express from 137 St to 96 St, skipping 125 St and 116 St.": {
       es: "Los fines de semana, los trenes 1 hacia downtown van expresos de 137 St a 96 St y no paran en 125 St ni 116 St.",
-      zh: "周末往下城方向的1号线从137街快车直达96街，不停125街和116街。" },
+      zh: "周末往下城方向的1号线从137街直达96街，中间的125街、116街都不停。" },
     "Thanksgiving": { es: "Acción de Gracias", zh: "感恩节" },
     "University holiday": { es: "Feriado universitario", zh: "学校假日" },
     "Saturday after Thanksgiving": { es: "Sábado después de Acción de Gracias", zh: "感恩节后的周六" },
@@ -543,6 +602,17 @@ const t = (k, v) => I.t(lang, k, v);
 const d = s => I.d(lang, s);
 const tm = hhmm => I.time(lang, hhmm);
 const dt = (ymd, o) => I.date(lang, ymd, o);
+// In Chinese the 上午/下午 prefix is set small so the digits carry the row.
+const tmHTML = hhmm => { const s = tm(hhmm); return lang === "zh" ? s.replace(/^(上午|下午)/, '<span class="ampm">$1</span>') : esc(s); };
+let cjkLoaded = false;
+function loadCjkFont(){
+  if (cjkLoaded || lang !== "zh") return;
+  cjkLoaded = true;
+  const l = document.createElement("link");
+  l.rel = "stylesheet";
+  l.href = "https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap";
+  document.head.appendChild(l);
+}
 const link = (key) => `<a href="${esc(DATA.source)}" target="_blank" rel="noopener noreferrer">${esc(t(key))}</a>`;
 const dur = m => m < 60 ? t("durMin", { m }) : t("durHM", { h: Math.floor(m / 60), m: m % 60 });
 const until = m => m <= 0 ? t("now") : m < 60 ? t("inMin", { m }) : t("inHM", { h: Math.floor(m / 60), m: m % 60 });
@@ -576,7 +646,7 @@ function render(){
     if (st.kind === "live") {
       const r = st.trips[st.nextIdx];
       hL.textContent = t("nextShuttle");
-      hB.innerHTML = st.waitMin <= 0 ? esc(t("now")) : st.waitMin < 60 ? `${st.waitMin}<small>${esc(t("min"))}</small>` : esc(tm(r[0]));
+      hB.innerHTML = st.waitMin <= 0 ? esc(t("now")) : st.waitMin < 60 ? `${st.waitMin}<small>${esc(t("min"))}</small>` : tmHTML(r[0]);
       hS.textContent = t("fromStop", { time: tm(r[0]), stop: d(svc.from.name) });
       hS2.textContent = t("arrives", { stop: d(svc.to.name), time: tm(r[1]) });
     } else if (st.kind === "ended" || st.kind === "notyet") {
@@ -601,21 +671,21 @@ function render(){
     // Departure list
     const rows = [];
     let past = [], upcoming = [];
-    const row = (cls, time, right) => `<div class="row${cls}"><span class="time">${esc(time)}</span><span class="in">${esc(right)}</span></div>`;
+    const row = (cls, hhmm, right) => `<div class="row${cls}"><span class="time">${tmHTML(hhmm)}</span><span class="in">${esc(right)}</span></div>`;
     if (st.kind === "live") {
       past = st.trips.slice(0, st.nextIdx);
       upcoming = st.trips.slice(st.nextIdx + 1);
       const nowM = st.now.mins;
-      past.slice(Math.max(0, past.length - back)).forEach(r => rows.push(row(" past", tm(r[0]), t("leftAgo", { d: dur(nowM - L.toMin(r[0])) }))));
-      upcoming.slice(0, shown).forEach(r => rows.push(row("", tm(r[0]), until(L.toMin(r[0]) - nowM))));
+      past.slice(Math.max(0, past.length - back)).forEach(r => rows.push(row(" past", r[0], t("leftAgo", { d: dur(nowM - L.toMin(r[0])) }))));
+      upcoming.slice(0, shown).forEach(r => rows.push(row("", r[0], until(L.toMin(r[0]) - nowM))));
       if (!upcoming.length) rows.push(`<div class="row"><span class="in">${esc(t("lastToday"))}</span></div>`);
     } else if (st.kind !== "ended" && st.kind !== "notyet") {
-      if (st.kind === "done") { past = st.trips; past.slice(Math.max(0, past.length - back)).forEach(r => rows.push(row(" past", tm(r[0]), t("left")))); }
+      if (st.kind === "done") { past = st.trips; past.slice(Math.max(0, past.length - back)).forEach(r => rows.push(row(" past", r[0], t("left")))); }
       const n = st.next;
       if (n) {
         upcoming = n.service.trips.slice(1);
         rows.push(`<div class="row daylabel">${esc(dt(n.ymd))}</div>`);
-        upcoming.slice(0, shown).forEach(r => rows.push(row("", tm(r[0]), t("arrivesShort", { stop: d(n.service.to.name), time: tm(r[1]) }))));
+        upcoming.slice(0, shown).forEach(r => rows.push(row("", r[0], t("arrivesShort", { stop: d(n.service.to.name), time: tm(r[1]) }))));
       }
     }
     $("list").hidden = !rows.length;
@@ -641,6 +711,7 @@ function render(){
 
 /* Static text and language */
 function applyLang(){
+  loadCjkFont();
   document.documentElement.lang = lang === "zh" ? "zh-Hans" : lang;
   document.title = t("appName");
   document.querySelectorAll("[data-t]").forEach(el => { el.textContent = t(el.dataset.t); });
