@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-4GaFLPtQhaF2YXJbydhDGgQi0X1iBTd29tw86osAM+M=' 'sha256-ZGEl8LY2oRNAMx3HIfiSJiLXv0UcMoaSuMoriYqk2NM='; style-src 'sha256-GbbfT0DlU8jL/fJDLODpW4PWXm7NUo5/Cp3TMG2Xpv4=' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; manifest-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-4GaFLPtQhaF2YXJbydhDGgQi0X1iBTd29tw86osAM+M=' 'sha256-HbTghupQiBoy4jefMBgC/Rl9jstHrzVwWRm4dh6JZPU=' 'sha256-d24N/AihfsCGvdcc2nljgFTXn1b8e7rmQqxqi9CjrAU='; style-src 'sha256-ZYyYzIdz42vx+yqXpcgsiEtaJXg8dqr8avbmFaNqZj8=' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; manifest-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <title>125 St Shuttle</title>
 <meta name="description" content="Next departure for Columbia's temporary 125 St shuttle">
@@ -109,81 +109,94 @@ details pre{white-space:pre-wrap;word-break:break-word;background:var(--bg);bord
 .btnrow{display:flex;flex-direction:column;gap:8px}
 .stack{display:flex;flex-direction:column;gap:10px}
 .small.strong{font-weight:600;color:var(--fg)}
+.langs{display:flex;gap:4px;justify-content:center;flex-wrap:wrap}
+.langs button{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:5px 11px;font-size:.8rem;font-weight:600;color:var(--muted)}
+.langs button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+.sheet .langs{justify-content:flex-start}
+.installed{background:var(--bg);border-radius:14px;padding:12px 14px;font-size:.92rem;font-weight:600}
+.warn{color:var(--one);font-weight:600}
+textarea[aria-invalid="true"]{border-color:var(--one)}
+.is-off{opacity:.45}
+.tertiary{border:0;background:none;color:var(--accent);font-weight:700;font-size:.95rem;padding:8px}
 </style>
 </head>
 <body>
 <div class="wrap" id="app">
   <div class="top">
-    <div class="brand"><span class="bullet" aria-hidden="true">1</span>125 St Shuttle</div>
+    <div class="brand"><span class="bullet" aria-hidden="true">1</span><span data-t="appName">125 St Shuttle</span></div>
     <div class="topr">
-      <div class="seg" role="group" aria-label="Schedule">
-        <button id="tab-weekday" type="button" data-key="weekday">Weekday</button>
-        <button id="tab-saturday" type="button" data-key="saturday">Sat</button>
+      <div class="seg" role="group" data-ta="scheduleAria">
+        <button id="tab-weekday" type="button" data-key="weekday" data-t="weekday">Weekday</button>
+        <button id="tab-saturday" type="button" data-key="saturday" data-t="sat">Sat</button>
       </div>
-      <button class="help" id="openHelp" type="button" aria-label="How to use this app">?</button>
+      <button class="help" id="openHelp" type="button" data-ta="helpAria">?</button>
     </div>
   </div>
 
   <p class="note" id="note" hidden></p>
 
   <section class="hero" aria-live="polite">
-    <p class="lbl" id="hLbl">Next shuttle</p>
+    <p class="lbl" id="hLbl"></p>
     <p class="big" id="hBig">—</p>
     <p class="sub" id="hSub"></p>
     <p class="sub2" id="hSub2"></p>
   </section>
 
-  <section class="list" id="list" aria-label="Departures">
-    <button class="more earlier" id="earlier" type="button">Show earlier times</button>
+  <section class="list" id="list">
+    <button class="more earlier" id="earlier" type="button" data-t="showEarlier">Show earlier times</button>
     <div id="rows"></div>
-    <button class="more" id="more" type="button">Show later times</button>
+    <button class="more" id="more" type="button" data-t="showLater">Show later times</button>
   </section>
 
-  <section class="route" id="route" aria-label="How to ride"></section>
+  <section class="route" id="route"></section>
 
   <footer class="foot">
-    <button class="linkbtn" id="openReport" type="button">Something look wrong? Tell Lian</button>
-    <p>Columbia ID required · No service on University holidays · Times checked against <a href="https://transportation.columbia.edu/content/125-street-station-shuttle-schedule" target="_blank" rel="noopener noreferrer">Columbia Transportation</a> on <span id="verified"></span> · v<span id="ver"></span></p>
+    <button class="linkbtn" id="openReport" type="button" data-t="reportOpen">Something look wrong? Tell Lian</button>
+    <div class="langs" role="group" data-ta="language"></div>
+    <p id="footText"></p>
   </footer>
 </div>
 
 <!-- How to use -->
 <div class="scrim" id="helpSheet" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
-    <h2 id="helpTitle">How to use the shuttle app</h2>
+    <h2 id="helpTitle" data-t="helpTitle">How to use the shuttle app</h2>
+    <div class="langs" role="group" data-ta="language"></div>
     <ul class="tips">
-      <li><span class="ic">1</span><span>The blue card shows the <b>next shuttle</b> and how many minutes until it leaves.</span></li>
-      <li><span class="ic">2</span><span>Switch between <b>Weekday</b> and <b>Sat</b>. They board at different stops.</span></li>
-      <li><span class="ic">3</span><span>Tap <b>Show earlier</b> or <b>Show later times</b> to see more departures.</span></li>
-      <li><span class="ic">4</span><span>The last card shows where to board. Tap <b>Map</b> for directions.</span></li>
+      <li><span class="ic">1</span><span data-th="tip1"></span></li>
+      <li><span class="ic">2</span><span data-th="tip2"></span></li>
+      <li><span class="ic">3</span><span data-th="tip3"></span></li>
+      <li><span class="ic">4</span><span data-th="tip4"></span></li>
     </ul>
-    <div id="installBlock" class="stack">
-      <h3>Save it to your home screen</h3>
-      <div class="plat" role="group" aria-label="Your device">
-        <button id="p-ios" type="button" data-p="ios">iPhone</button>
-        <button id="p-android" type="button" data-p="android">Android</button>
-        <button id="p-desktop" type="button" data-p="desktop">Computer</button>
+    <div class="stack">
+      <h3 data-t="saveTitle">Save it to your home screen</h3>
+      <p class="installed" id="installedNote" data-t="installedNote" hidden></p>
+      <div class="plat" role="group" data-ta="deviceAria">
+        <button id="p-ios" type="button" data-p="ios" data-t="iphone">iPhone</button>
+        <button id="p-android" type="button" data-p="android" data-t="android">Android</button>
+        <button id="p-desktop" type="button" data-p="desktop" data-t="computer">Computer</button>
       </div>
       <div class="howto" id="howto"></div>
     </div>
-    <button class="primary" id="closeHelp" type="button">Got it</button>
+    <button class="primary" id="closeHelp" type="button" data-t="gotIt">Got it</button>
   </div>
 </div>
 
 <!-- Report a problem -->
 <div class="scrim" id="reportSheet" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="reportTitle">
-    <h2 id="reportTitle">Something went wrong?</h2>
-    <p class="small">Tell Lian what you expected and what the app showed. A few details about the app are added automatically so she can fix it.</p>
-    <label for="reportText" class="small strong">What happened</label>
-    <textarea id="reportText" placeholder="Example: It said the next shuttle was 6:00 PM, but the bus left at 5:55."></textarea>
-    <details><summary>Details that get attached</summary><pre id="reportLog"></pre></details>
+    <h2 id="reportTitle" data-t="reportTitle">Something went wrong?</h2>
+    <p class="small" data-t="reportIntro"></p>
+    <label for="reportText" class="small strong" data-t="reportLabel">What happened (required)</label>
+    <textarea id="reportText" required minlength="5" maxlength="2000" aria-describedby="reportMsg"></textarea>
+    <details><summary data-t="reportDetails">Details that get attached</summary><pre id="reportLog"></pre></details>
     <div class="btnrow">
-      <a class="primary" id="reportGithub" href="#" target="_blank" rel="noopener noreferrer">Send report on GitHub</a>
-      <button class="secondary" id="reportCopy" type="button">Copy report to send another way</button>
-      <p class="small" id="copyMsg" role="status"></p>
+      <button class="primary" id="reportEmail" type="button" data-t="sendEmail">Email Lian</button>
+      <button class="secondary" id="reportGithub" type="button" data-t="sendGithub">Report on GitHub</button>
+      <button class="tertiary" id="reportCopy" type="button" data-t="copyReport">Copy report</button>
+      <p class="small" id="reportMsg" role="status"></p>
     </div>
-    <button class="linkbtn" id="closeReport" type="button">Cancel</button>
+    <button class="linkbtn" id="closeReport" type="button" data-t="cancel">Cancel</button>
   </div>
 </div>
 
@@ -309,10 +322,210 @@ if (typeof module !== "undefined") module.exports = ShuttleLogic;
 
 </script>
 <script>
+/* UI text in English, Spanish and Simplified Chinese, plus translations of the schedule data strings.
+ * Strings may contain {name} placeholders. Strings marked with <b> are trusted markup from this file only. */
+const ShuttleI18n = (() => {
+  const LANGS = { en: { label: "English", locale: "en-US" }, es: { label: "Español", locale: "es-US" }, zh: { label: "中文", locale: "zh-CN" } };
+
+  const T = {
+    en: {
+      appName: "125 St Shuttle", weekday: "Weekday", sat: "Sat", helpAria: "How to use this app", scheduleAria: "Schedule",
+      nextShuttle: "Next shuttle", min: "min", now: "Now",
+      fromStop: "{time} from {stop}", arrives: "Arrives {stop} at {time}",
+      ended: "Temporary shuttle ended", endedWord: "Ended", notYet: "Not running yet", soon: "Soon",
+      lastDay: "The last scheduled day was {date}.", checkUpdates: "Check {link} for updates.", check: "Check {link}.",
+      linkName: "Columbia Transportation", siteName: "Columbia's site",
+      closedToday: "No shuttle today · {reason}", done: "Done for today", runsSat: "Runs on Saturdays", runsWk: "Runs on weekdays",
+      tomorrow: "Tomorrow", nextOn: "Next shuttle: {date}", leavesFrom: "Leaves from {stop}", none: "None", noMore: "No more trips scheduled",
+      staleNote: "Times were last checked {date}. Double-check on {link}.",
+      endingNote: "This schedule runs through {date}. Columbia may change it after that.",
+      showEarlier: "Show earlier times", showLater: "Show later times",
+      leftAgo: "left {d} ago", left: "left", inMin: "in {m} min", inHM: "in {h} h {m} min", durMin: "{m} min", durHM: "{h} h {m} min",
+      lastToday: "That's the last shuttle today.", arrivesShort: "arrives {stop} {time}",
+      boardAt: "Board at {stop}", getOff: "Get off at {stop}", aboutMin: "about {m} min", map: "Map",
+      reportOpen: "Something look wrong? Tell Lian",
+      footer: "Columbia ID required · No service on University holidays · Times checked against {link} on {date}",
+      language: "Language",
+      helpTitle: "How to use the shuttle app",
+      tip1: "The blue card shows the <b>next shuttle</b> and how many minutes until it leaves.",
+      tip2: "Switch between <b>Weekday</b> and <b>Sat</b>. They board at different stops.",
+      tip3: "Tap <b>Show earlier</b> or <b>Show later times</b> to see more departures.",
+      tip4: "The last card shows where to board. Tap <b>Map</b> for directions.",
+      saveTitle: "Save it to your home screen", iphone: "iPhone", android: "Android", computer: "Computer", deviceAria: "Your device",
+      howIos: "<ol><li>Open this page in <b>Safari</b>.</li><li>Tap <b>Share</b> (the square with an arrow).</li><li>Scroll down and tap <b>Add to Home Screen</b>, then <b>Add</b>.</li></ol>",
+      howAndroid: "<ol><li>Open this page in <b>Chrome</b>.</li><li>Tap the <b>⋮</b> menu at the top right.</li><li>Tap <b>Add to Home screen</b>, then <b>Add</b>.</li></ol>",
+      howDesktop: "<ol><li>In Chrome or Edge, click the <b>install icon</b> at the right end of the address bar, if you see one.</li><li>Or bookmark it: <b>⌘D</b> on Mac, <b>Ctrl+D</b> on Windows.</li></ol>",
+      installedNote: "✓ It's already on your home screen. Open it from there anytime.",
+      gotIt: "Got it",
+      reportTitle: "Something went wrong?",
+      reportIntro: "Tell Lian what you expected and what the app showed. A few details about the app are added automatically so she can fix it.",
+      reportLabel: "What happened (required)",
+      reportPlaceholder: "Example: It said the next shuttle was 6:00 PM, but the bus left at 5:55.",
+      reportDetails: "Details that get attached",
+      needText: "Please describe what happened first (at least a few words).",
+      sendEmail: "Email Lian", sendGithub: "Report on GitHub", copyReport: "Copy report",
+      copied: "Copied. Paste it into a text or email to Lian.", copyFallback: "Select and copy the details above.",
+      emailOpened: "Your email app should open with the report filled in.",
+      cancel: "Cancel", emailSubject: "125 St Shuttle app problem",
+      whatHappened: "What happened", details: "Details",
+      errTitle: "Something went wrong", oops: "Oops", errSub: "The app couldn't work out the schedule.",
+      errCheck: "Check {link}, and tap “Tell Lian” below."
+    },
+    es: {
+      appName: "Shuttle 125 St", weekday: "Lun–Vie", sat: "Sáb", helpAria: "Cómo usar esta app", scheduleAria: "Horario",
+      nextShuttle: "Próximo shuttle", min: "min", now: "Ahora",
+      fromStop: "{time} desde {stop}", arrives: "Llega a {stop} a las {time}",
+      ended: "El shuttle temporal terminó", endedWord: "Terminó", notYet: "Aún no funciona", soon: "Pronto",
+      lastDay: "El último día programado fue el {date}.", checkUpdates: "Consulta {link} para novedades.", check: "Consulta {link}.",
+      linkName: "Columbia Transportation", siteName: "el sitio de Columbia",
+      closedToday: "Sin shuttle hoy · {reason}", done: "Terminado por hoy", runsSat: "Funciona los sábados", runsWk: "Funciona entre semana",
+      tomorrow: "Mañana", nextOn: "Próximo shuttle: {date}", leavesFrom: "Sale de {stop}", none: "Ninguno", noMore: "No hay más viajes programados",
+      staleNote: "Los horarios se revisaron por última vez el {date}. Confírmalos en {link}.",
+      endingNote: "Este horario rige hasta el {date}. Columbia podría cambiarlo después.",
+      showEarlier: "Ver horarios anteriores", showLater: "Ver horarios posteriores",
+      leftAgo: "salió hace {d}", left: "salió", inMin: "en {m} min", inHM: "en {h} h {m} min", durMin: "{m} min", durHM: "{h} h {m} min",
+      lastToday: "Es el último shuttle de hoy.", arrivesShort: "llega a {stop} {time}",
+      boardAt: "Sube en {stop}", getOff: "Bájate en {stop}", aboutMin: "unos {m} min", map: "Mapa",
+      reportOpen: "¿Algo está mal? Avísale a Lian",
+      footer: "Se requiere ID de Columbia · Sin servicio en feriados universitarios · Horarios revisados en {link} el {date}",
+      language: "Idioma",
+      helpTitle: "Cómo usar la app del shuttle",
+      tip1: "La tarjeta azul muestra el <b>próximo shuttle</b> y cuántos minutos faltan para que salga.",
+      tip2: "Cambia entre <b>Lun–Vie</b> y <b>Sáb</b>. Se sube en paradas diferentes.",
+      tip3: "Toca <b>Ver horarios anteriores</b> o <b>posteriores</b> para ver más salidas.",
+      tip4: "La última tarjeta muestra dónde subir. Toca <b>Mapa</b> para ver cómo llegar.",
+      saveTitle: "Guárdala en tu pantalla de inicio", iphone: "iPhone", android: "Android", computer: "Computadora", deviceAria: "Tu dispositivo",
+      howIos: "<ol><li>Abre esta página en <b>Safari</b>.</li><li>Toca <b>Compartir</b> (el cuadrado con una flecha).</li><li>Desliza hacia abajo, toca <b>Agregar a pantalla de inicio</b> y luego <b>Agregar</b>.</li></ol>",
+      howAndroid: "<ol><li>Abre esta página en <b>Chrome</b>.</li><li>Toca el menú <b>⋮</b> arriba a la derecha.</li><li>Toca <b>Agregar a la pantalla principal</b> y luego <b>Agregar</b>.</li></ol>",
+      howDesktop: "<ol><li>En Chrome o Edge, haz clic en el <b>ícono de instalar</b> al final de la barra de direcciones, si aparece.</li><li>O guárdala como favorito: <b>⌘D</b> en Mac, <b>Ctrl+D</b> en Windows.</li></ol>",
+      installedNote: "✓ Ya está en tu pantalla de inicio. Ábrela desde ahí cuando quieras.",
+      gotIt: "Entendido",
+      reportTitle: "¿Algo salió mal?",
+      reportIntro: "Cuéntale a Lian qué esperabas y qué mostró la app. Se agregan automáticamente algunos datos de la app para que pueda arreglarlo.",
+      reportLabel: "Qué pasó (obligatorio)",
+      reportPlaceholder: "Ejemplo: Decía que el próximo shuttle era a las 6:00 p. m., pero el bus salió a las 5:55.",
+      reportDetails: "Datos que se adjuntan",
+      needText: "Primero describe qué pasó (al menos unas palabras).",
+      sendEmail: "Enviar correo a Lian", sendGithub: "Reportar en GitHub", copyReport: "Copiar reporte",
+      copied: "Copiado. Pégalo en un mensaje o correo para Lian.", copyFallback: "Selecciona y copia los datos de arriba.",
+      emailOpened: "Tu app de correo debería abrirse con el reporte listo.",
+      cancel: "Cancelar", emailSubject: "Problema con la app del shuttle 125 St",
+      whatHappened: "Qué pasó", details: "Datos",
+      errTitle: "Algo salió mal", oops: "Ups", errSub: "La app no pudo calcular el horario.",
+      errCheck: "Consulta {link} y toca “Avísale a Lian” abajo."
+    },
+    zh: {
+      appName: "125街接驳车", weekday: "工作日", sat: "周六", helpAria: "使用说明", scheduleAria: "时刻表",
+      nextShuttle: "下一班", min: "分钟", now: "现在",
+      fromStop: "{time} 从{stop}出发", arrives: "{time} 到达{stop}",
+      ended: "临时接驳车已停运", endedWord: "已停运", notYet: "尚未开始运行", soon: "即将",
+      lastDay: "最后一个运行日是{date}。", checkUpdates: "请查看{link}了解最新信息。", check: "请查看{link}。",
+      linkName: "哥大交通处", siteName: "哥大网站",
+      closedToday: "今天停运 · {reason}", done: "今天已结束", runsSat: "周六运行", runsWk: "工作日运行",
+      tomorrow: "明天", nextOn: "下一班：{date}", leavesFrom: "从{stop}出发", none: "无", noMore: "没有更多班次",
+      staleNote: "时刻表最后核对于{date}。请到{link}再次确认。",
+      endingNote: "此时刻表有效期至{date}，之后哥大可能会调整。",
+      showEarlier: "查看更早班次", showLater: "查看更晚班次",
+      leftAgo: "{d}前已出发", left: "已出发", inMin: "{m}分钟后", inHM: "{h}小时{m}分钟后", durMin: "{m}分钟", durHM: "{h}小时{m}分钟",
+      lastToday: "这是今天的最后一班。", arrivesShort: "{time} 到达{stop}",
+      boardAt: "在{stop}上车", getOff: "在{stop}下车", aboutMin: "约{m}分钟", map: "地图",
+      reportOpen: "发现问题？告诉Lian",
+      footer: "需出示哥大学生/员工证 · 学校假日停运 · 时刻表于{date}与{link}核对",
+      language: "语言",
+      helpTitle: "接驳车App使用说明",
+      tip1: "蓝色卡片显示<b>下一班车</b>以及还有几分钟发车。",
+      tip2: "可在<b>工作日</b>和<b>周六</b>之间切换，两者上车地点不同。",
+      tip3: "点<b>查看更早班次</b>或<b>查看更晚班次</b>可看到更多班次。",
+      tip4: "最下面的卡片显示上车地点，点<b>地图</b>查看路线。",
+      saveTitle: "添加到主屏幕", iphone: "iPhone", android: "安卓", computer: "电脑", deviceAria: "你的设备",
+      howIos: "<ol><li>用 <b>Safari</b> 打开本页面。</li><li>点<b>分享</b>按钮（带箭头的方框）。</li><li>向下滑动，点<b>添加到主屏幕</b>，再点<b>添加</b>。</li></ol>",
+      howAndroid: "<ol><li>用 <b>Chrome</b> 打开本页面。</li><li>点右上角的 <b>⋮</b> 菜单。</li><li>点<b>添加到主屏幕</b>，再点<b>添加</b>。</li></ol>",
+      howDesktop: "<ol><li>在 Chrome 或 Edge 中，点击地址栏右侧的<b>安装图标</b>（如果有）。</li><li>或添加书签：Mac 按 <b>⌘D</b>，Windows 按 <b>Ctrl+D</b>。</li></ol>",
+      installedNote: "✓ 已添加到主屏幕，随时从主屏幕打开即可。",
+      gotIt: "知道了",
+      reportTitle: "遇到问题了？",
+      reportIntro: "告诉Lian你预期看到什么、App实际显示了什么。系统会自动附上一些App信息，方便她修复。",
+      reportLabel: "发生了什么（必填）",
+      reportPlaceholder: "例如：显示下一班是下午6:00，但车5:55就开走了。",
+      reportDetails: "将附带的信息",
+      needText: "请先描述发生了什么（至少几个字）。",
+      sendEmail: "发邮件给Lian", sendGithub: "在GitHub上报告", copyReport: "复制报告",
+      copied: "已复制。粘贴到短信或邮件中发给Lian即可。", copyFallback: "请选中并复制上面的信息。",
+      emailOpened: "邮件App应会打开，并已填好报告内容。",
+      cancel: "取消", emailSubject: "125街接驳车App问题",
+      whatHappened: "发生了什么", details: "附带信息",
+      errTitle: "出错了", oops: "出错了", errSub: "App无法计算时刻表。",
+      errCheck: "请查看{link}，并点下方“告诉Lian”。"
+    }
+  };
+
+  // Translations of every human-readable string in schedule.json. English is the key.
+  const DATA_TEXT = {
+    "Forum S": { es: "Forum S", zh: "Forum S站" },
+    "116 St": { es: "116 St", zh: "116街" },
+    "Business School": { es: "la Escuela de Negocios", zh: "商学院" },
+    "137 St": { es: "137 St", zh: "137街" },
+    "Broadway & W 129 St (M4 bus stop)": { es: "Broadway y W 129 St (parada del bus M4)", zh: "百老汇大道与西129街（M4公交站）" },
+    "SW corner of Broadway & W 116 St": { es: "Esquina suroeste de Broadway y W 116 St", zh: "百老汇大道与西116街西南角" },
+    "2289 12th Ave, Manhattanville": { es: "2289 12th Ave, Manhattanville", zh: "2289 12th Ave（曼哈顿维尔校区）" },
+    "3387 Broadway, by 137 St–City College": { es: "3387 Broadway, junto a 137 St–City College", zh: "3387 Broadway，靠近137街–城市学院站" },
+    "Take the downtown 1 from 116 St–Columbia": { es: "Toma el tren 1 hacia downtown en 116 St–Columbia", zh: "在116街–哥伦比亚大学站乘坐1号线往下城方向" },
+    "Take the downtown 1 from 137 St (express to 96 St)": { es: "Toma el tren 1 hacia downtown en 137 St (expreso hasta 96 St)", zh: "在137街乘坐1号线往下城方向（快车直达96街）" },
+    "On weekdays, downtown 1 trains skip 125 St. Uptown trains still stop there.": {
+      es: "Entre semana, los trenes 1 hacia downtown no paran en 125 St. Los que van hacia uptown sí paran.",
+      zh: "工作日往下城方向的1号线不停125街，往上城方向的列车照常停靠。" },
+    "On weekends, downtown 1 trains run express from 137 St to 96 St, skipping 125 St and 116 St.": {
+      es: "Los fines de semana, los trenes 1 hacia downtown van expresos de 137 St a 96 St y no paran en 125 St ni 116 St.",
+      zh: "周末往下城方向的1号线从137街快车直达96街，不停125街和116街。" },
+    "Thanksgiving": { es: "Acción de Gracias", zh: "感恩节" },
+    "University holiday": { es: "Feriado universitario", zh: "学校假日" },
+    "Saturday after Thanksgiving": { es: "Sábado después de Acción de Gracias", zh: "感恩节后的周六" },
+    "Christmas": { es: "Navidad", zh: "圣诞节" },
+    "Saturday after Christmas": { es: "Sábado después de Navidad", zh: "圣诞节后的周六" }
+  };
+
+  function pick(navLangs) {
+    for (const l of navLangs || []) {
+      const s = String(l).toLowerCase();
+      if (s.startsWith("zh")) return "zh";
+      if (s.startsWith("es")) return "es";
+      if (s.startsWith("en")) return "en";
+    }
+    return "en";
+  }
+  function t(lang, key, vars) {
+    let s = (T[lang] && T[lang][key]) ?? T.en[key];
+    if (s == null) throw new Error("Missing text: " + key);
+    if (vars) s = s.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m));
+    return s;
+  }
+  const d = (lang, s) => (lang === "en" || !DATA_TEXT[s] ? s : DATA_TEXT[s][lang] || s);
+
+  // "16:30" → "4:30 PM" / "4:30 p. m." / "下午4:30"
+  function time(lang, hhmm) {
+    const [h, m] = hhmm.split(":").map(Number);
+    const hm = `${h % 12 || 12}:${String(m).padStart(2, "0")}`;
+    if (lang === "zh") return `${h < 12 ? "上午" : "下午"}${hm}`;
+    if (lang === "es") return `${hm} ${h < 12 ? "a. m." : "p. m."}`;
+    return `${hm} ${h < 12 ? "AM" : "PM"}`;
+  }
+  function date(lang, ymd, opts) {
+    return new Date(ymd + "T12:00:00Z").toLocaleDateString(LANGS[lang].locale,
+      Object.assign({ timeZone: "UTC", weekday: "short", month: "short", day: "numeric" }, opts || {}));
+  }
+
+  return { LANGS, T, DATA_TEXT, pick, t, d, time, date };
+})();
+if (typeof module !== "undefined") module.exports = ShuttleI18n;
+
+</script>
+<script>
 const DATA = {"dataVersion":"2026-11-09","verifiedAt":"2026-11-09","source":"https://transportation.columbia.edu/content/125-street-station-shuttle-schedule","phases":[{"id":"phase-1","start":"2026-10-26","end":"2026-12-18","why":{"weekday":"On weekdays, downtown 1 trains skip 125 St. Uptown trains still stop there.","saturday":"On weekends, downtown 1 trains run express from 137 St to 96 St, skipping 125 St and 116 St."},"services":{"weekday":{"label":"Weekday","days":[1,2,3,4,5],"start":"2026-10-26","from":{"name":"Forum S","detail":"Broadway & W 129 St (M4 bus stop)","address":"3219 Broadway, New York, NY"},"to":{"name":"116 St","detail":"SW corner of Broadway & W 116 St","address":"Broadway and W 116 St, New York, NY"},"rideMinutes":4,"train":"Take the downtown 1 from 116 St–Columbia","trips":[["16:30","16:34","16:42"],["16:37","16:41","16:49"],["16:45","16:49","16:57"],["16:52","16:56","17:04"],["17:00","17:04","17:12"],["17:07","17:11","17:19"],["17:15","17:19","17:27"],["17:22","17:26","17:34"],["17:30","17:34","17:42"],["17:37","17:41","17:49"],["17:45","17:49","17:57"],["17:52","17:56","18:04"],["18:00","18:04","18:12"],["18:07","18:11","18:19"],["18:15","18:19","18:27"],["18:22","18:26","18:34"],["18:30","18:34","18:42"],["18:37","18:41","18:49"],["18:45","18:49","18:57"],["18:52","18:56","19:04"],["19:35","19:39","19:47"],["19:40","19:44","19:52"],["19:50","19:54","20:02"],["19:55","19:59","20:07"],["20:05","20:09","20:17"],["20:10","20:14","20:22"],["20:20","20:24","20:32"],["20:25","20:29","20:37"],["20:35","20:39","20:47"],["20:40","20:44","20:52"],["20:50","20:54","21:02"],["20:55","20:59","21:07"],["21:05","21:09","21:17"],["21:10","21:14","21:22"],["21:20","21:24","21:32"],["21:25","21:29","21:37"],["21:35","21:39",null],["21:40","21:44",null]]},"saturday":{"label":"Sat","days":[6],"start":"2026-11-07","from":{"name":"Business School","detail":"2289 12th Ave, Manhattanville","address":"2289 12th Ave, New York, NY"},"to":{"name":"137 St","detail":"3387 Broadway, by 137 St–City College","address":"3387 Broadway, New York, NY"},"rideMinutes":5,"train":"Take the downtown 1 from 137 St (express to 96 St)","trips":[["13:00","13:05","13:10"],["13:15","13:20","13:25"],["13:30","13:35","13:40"],["13:45","13:50","13:55"],["14:00","14:05","14:10"],["14:15","14:20","14:25"],["14:30","14:35","14:40"],["14:45","14:50","14:55"],["15:00","15:05","15:10"],["15:07","15:12","15:17"],["15:15","15:20","15:25"],["15:22","15:27","15:32"],["15:30","15:35","15:40"],["15:37","15:42","15:47"],["15:45","15:50","15:55"],["15:52","15:57","16:02"],["16:00","16:05","16:10"],["16:07","16:12","16:17"],["16:15","16:20","16:25"],["16:22","16:27","16:32"],["16:30","16:35","16:40"],["16:37","16:42","16:47"],["16:45","16:50","16:55"],["16:52","16:57","17:02"],["17:00","17:05","17:10"],["17:07","17:12","17:17"],["17:15","17:20","17:25"],["17:22","17:27","17:32"],["17:30","17:35","17:40"],["17:37","17:42","17:47"],["17:45","17:50","17:55"],["18:00","18:05","18:10"],["18:15","18:20","18:25"],["18:30","18:35","18:40"],["18:45","18:50","18:55"],["19:00","19:05","19:10"],["19:15","19:20","19:25"],["19:30","19:35","19:40"],["19:45","19:50","19:55"],["20:00","20:05",null]]}}}],"closures":[{"date":"2026-11-26","reason":"Thanksgiving"},{"date":"2026-11-27","reason":"University holiday"},{"date":"2026-11-28","reason":"Saturday after Thanksgiving"},{"date":"2026-12-24","reason":"University holiday"},{"date":"2026-12-25","reason":"Christmas"},{"date":"2026-12-26","reason":"Saturday after Christmas"},{"date":"2026-12-31","reason":"University holiday"}]};
-const APP_VERSION = "2.0.0+2026-11-09";
+const APP_VERSION = "2.1.0+2026-11-09";
 const REPO = "aeo-lian/Columbia-Business-School-125-St-Shuttle";
-const L = ShuttleLogic;
+// Lian's address is assembled only when someone taps "Email Lian", so it never appears in the page text.
+const MAIL_PARTS = ["lian.liu", "columbia.edu"];
+const L = ShuttleLogic, I = ShuttleI18n;
 const $ = id => document.getElementById(id);
 const errors = [];
 window.addEventListener("error", e => errors.push(`${e.message} @${(e.filename||"").split("/").pop()}:${e.lineno}`));
@@ -324,6 +537,15 @@ const store = {
 };
 const mapUrl = q => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+let lang = I.LANGS[store.get("lang")] ? store.get("lang") : I.pick(navigator.languages || [navigator.language]);
+const t = (k, v) => I.t(lang, k, v);
+const d = s => I.d(lang, s);
+const tm = hhmm => I.time(lang, hhmm);
+const dt = (ymd, o) => I.date(lang, ymd, o);
+const link = (key) => `<a href="${esc(DATA.source)}" target="_blank" rel="noopener noreferrer">${esc(t(key))}</a>`;
+const dur = m => m < 60 ? t("durMin", { m }) : t("durHM", { h: Math.floor(m / 60), m: m % 60 });
+const until = m => m <= 0 ? t("now") : m < 60 ? t("inMin", { m }) : t("inHM", { h: Math.floor(m / 60), m: m % 60 });
 
 let viewKey, shown = 4, back = 0, last = null;
 
@@ -338,63 +560,62 @@ function render(){
     // Notes: stale data, or the schedule is about to end.
     const notes = [];
     const ageDays = Math.round((Date.parse(st.now.ymd) - Date.parse(DATA.verifiedAt)) / 864e5);
-    if (ageDays > 10) notes.push(`Times were last checked ${L.prettyDate(DATA.verifiedAt)}. Double-check on <a href="${esc(DATA.source)}" target="_blank" rel="noopener noreferrer">Columbia's site</a>.`);
+    if (ageDays > 10) notes.push(esc(t("staleNote", { date: dt(DATA.verifiedAt), link: "\u0000" })).replace("\u0000", link("siteName")));
     const phase = L.phaseFor(DATA, st.now.ymd);
     if (phase) {
       const left = Math.round((Date.parse(phase.end) - Date.parse(st.now.ymd)) / 864e5);
-      if (left >= 0 && left <= 7) notes.push(`This schedule runs through ${L.prettyDate(phase.end)}. Columbia may change it after that.`);
+      if (left >= 0 && left <= 7) notes.push(esc(t("endingNote", { date: dt(phase.end) })));
     }
     $("note").innerHTML = notes.join("<br>");
     $("note").hidden = !notes.length;
 
     // Hero
     const hL=$("hLbl"), hB=$("hBig"), hS=$("hSub"), hS2=$("hSub2");
+    const withLink = (key, extra) => esc(t(key, Object.assign({ link: "\u0000" }, extra))).replace("\u0000", link("linkName"));
     hB.classList.remove("word");
     if (st.kind === "live") {
       const r = st.trips[st.nextIdx];
-      hL.textContent = "Next shuttle";
-      hB.innerHTML = st.waitMin <= 0 ? "Now" : st.waitMin < 60 ? `${st.waitMin}<small>min</small>` : esc(L.fmt(r[0]));
-      hS.textContent = `${L.fmt(r[0])} from ${svc.from.name}`;
-      hS2.textContent = `Arrives ${svc.to.name} at ${L.fmt(r[1])}`;
+      hL.textContent = t("nextShuttle");
+      hB.innerHTML = st.waitMin <= 0 ? esc(t("now")) : st.waitMin < 60 ? `${st.waitMin}<small>${esc(t("min"))}</small>` : esc(tm(r[0]));
+      hS.textContent = t("fromStop", { time: tm(r[0]), stop: d(svc.from.name) });
+      hS2.textContent = t("arrives", { stop: d(svc.to.name), time: tm(r[1]) });
     } else if (st.kind === "ended" || st.kind === "notyet") {
-      hL.textContent = st.kind === "ended" ? "Temporary shuttle ended" : "Not running yet";
-      hB.textContent = st.kind === "ended" ? "Ended" : "Soon"; hB.classList.add("word");
-      hS.textContent = st.kind === "ended" ? `The last scheduled day was ${L.prettyDate(st.endedOn)}.` : "";
-      hS2.innerHTML = `Check <a href="${esc(DATA.source)}" target="_blank" rel="noopener noreferrer">Columbia Transportation</a> for updates.`;
+      hL.textContent = st.kind === "ended" ? t("ended") : t("notYet");
+      hB.textContent = st.kind === "ended" ? t("endedWord") : t("soon"); hB.classList.add("word");
+      hS.textContent = st.kind === "ended" ? t("lastDay", { date: dt(st.endedOn) }) : "";
+      hS2.innerHTML = withLink("checkUpdates");
     } else {
       const n = st.next;
-      hL.textContent = st.kind === "closed" ? `No shuttle today · ${st.reason}` :
-                       st.kind === "done" ? "Done for today" :
-                       viewKey === "saturday" ? "Runs on Saturdays" : "Runs on weekdays";
+      hL.textContent = st.kind === "closed" ? t("closedToday", { reason: d(st.reason) }) :
+                       st.kind === "done" ? t("done") :
+                       viewKey === "saturday" ? t("runsSat") : t("runsWk");
       if (n) {
-        const dayWord = n.ymd === L.addDays(st.now.ymd, 1) ? "Tomorrow" : L.prettyDate(n.ymd).split(",")[0];
-        hB.textContent = `${dayWord} ${L.fmt(n.first)}`; hB.classList.add("word");
-        hS.textContent = `Next shuttle: ${L.prettyDate(n.ymd)}`;
-        hS2.textContent = `Leaves from ${n.service.from.name}`;
+        const dayWord = n.ymd === L.addDays(st.now.ymd, 1) ? t("tomorrow") : dt(n.ymd, { month: undefined, day: undefined });
+        hB.textContent = `${dayWord} ${tm(n.first)}`; hB.classList.add("word");
+        hS.textContent = t("nextOn", { date: dt(n.ymd) });
+        hS2.textContent = t("leavesFrom", { stop: d(n.service.from.name) });
       }
-      else { hB.textContent = "None"; hB.classList.add("word"); hS.textContent = "No more trips scheduled"; hS2.innerHTML = `Check <a href="${esc(DATA.source)}" target="_blank" rel="noopener noreferrer">Columbia Transportation</a>.`; }
+      else { hB.textContent = t("none"); hB.classList.add("word"); hS.textContent = t("noMore"); hS2.innerHTML = withLink("check"); }
     }
 
     // Departure list
     const rows = [];
     let past = [], upcoming = [];
+    const row = (cls, time, right) => `<div class="row${cls}"><span class="time">${esc(time)}</span><span class="in">${esc(right)}</span></div>`;
     if (st.kind === "live") {
       past = st.trips.slice(0, st.nextIdx);
       upcoming = st.trips.slice(st.nextIdx + 1);
-      const now = st.now.mins;
-      past.slice(Math.max(0, past.length - back)).forEach(r => {
-        const ago = now - L.toMin(r[0]);
-        rows.push(`<div class="row past"><span class="time">${L.fmt(r[0])}</span><span class="in">left ${ago < 60 ? ago + " min" : Math.floor(ago/60) + " h " + ago % 60 + " min"} ago</span></div>`);
-      });
-      upcoming.slice(0, shown).forEach(r => rows.push(`<div class="row"><span class="time">${L.fmt(r[0])}</span><span class="in">${L.minsText(L.toMin(r[0]) - now)}</span></div>`));
-      if (!upcoming.length) rows.push(`<div class="row"><span class="in">That's the last shuttle today.</span></div>`);
+      const nowM = st.now.mins;
+      past.slice(Math.max(0, past.length - back)).forEach(r => rows.push(row(" past", tm(r[0]), t("leftAgo", { d: dur(nowM - L.toMin(r[0])) }))));
+      upcoming.slice(0, shown).forEach(r => rows.push(row("", tm(r[0]), until(L.toMin(r[0]) - nowM))));
+      if (!upcoming.length) rows.push(`<div class="row"><span class="in">${esc(t("lastToday"))}</span></div>`);
     } else if (st.kind !== "ended" && st.kind !== "notyet") {
-      if (st.kind === "done") { past = st.trips; past.slice(Math.max(0, past.length - back)).forEach(r => rows.push(`<div class="row past"><span class="time">${L.fmt(r[0])}</span><span class="in">left</span></div>`)); }
+      if (st.kind === "done") { past = st.trips; past.slice(Math.max(0, past.length - back)).forEach(r => rows.push(row(" past", tm(r[0]), t("left")))); }
       const n = st.next;
       if (n) {
         upcoming = n.service.trips.slice(1);
-        rows.push(`<div class="row daylabel">${esc(L.prettyDate(n.ymd))}</div>`);
-        upcoming.slice(0, shown).forEach(r => rows.push(`<div class="row"><span class="time">${L.fmt(r[0])}</span><span class="in">arrives ${esc(n.service.to.name)} ${L.fmt(r[1])}</span></div>`));
+        rows.push(`<div class="row daylabel">${esc(dt(n.ymd))}</div>`);
+        upcoming.slice(0, shown).forEach(r => rows.push(row("", tm(r[0]), t("arrivesShort", { stop: d(n.service.to.name), time: tm(r[1]) }))));
       }
     }
     $("list").hidden = !rows.length;
@@ -404,19 +625,39 @@ function render(){
 
     // Route
     const why = phase ? phase.why[viewKey] : (DATA.phases[0].why || {})[viewKey];
-    $("route").innerHTML = (why ? `<p class="why">${esc(why)}</p>` : "") + [
-      ["1", `<b>Board at ${esc(svc.from.name)}</b><br>${esc(svc.from.detail)}`, svc.from.address],
-      ["2", `<b>Get off at ${esc(svc.to.name)}</b> · about ${svc.rideMinutes} min`, svc.to.address],
-      ["1", `<b>${esc(svc.train)}</b>`, null, true]
-    ].map(([n,h,q,train]) => `<div class="step"><span class="n${train?" train":""}">${n}</span><span>${h}</span>${q ? `<a href="${esc(mapUrl(q))}" target="_blank" rel="noopener noreferrer">Map</a>` : "<span></span>"}</div>`).join("");
+    $("route").innerHTML = (why ? `<p class="why">${esc(d(why))}</p>` : "") + [
+      ["1", `<b>${esc(t("boardAt", { stop: d(svc.from.name) }))}</b><br>${esc(d(svc.from.detail))}`, svc.from.address],
+      ["2", `<b>${esc(t("getOff", { stop: d(svc.to.name) }))}</b> · ${esc(t("aboutMin", { m: svc.rideMinutes }))}`, svc.to.address],
+      ["1", `<b>${esc(d(svc.train))}</b>`, null, true]
+    ].map(([n,h,q,train]) => `<div class="step"><span class="n${train?" train":""}">${n}</span><span>${h}</span>${q ? `<a href="${esc(mapUrl(q))}" target="_blank" rel="noopener noreferrer">${esc(t("map"))}</a>` : "<span></span>"}</div>`).join("");
   } catch (e) {
     errors.push("render: " + (e && e.stack || e));
-    $("hLbl").textContent = "Something went wrong";
-    $("hBig").textContent = "Oops"; $("hBig").classList.add("word");
-    $("hSub").textContent = "The app couldn't work out the schedule.";
-    $("hSub2").innerHTML = `Check <a href="${esc(DATA && DATA.source)}" target="_blank" rel="noopener noreferrer">Columbia Transportation</a>, and tap “Tell Lian” below.`;
+    $("hLbl").textContent = t("errTitle");
+    $("hBig").textContent = t("oops"); $("hBig").classList.add("word");
+    $("hSub").textContent = t("errSub");
+    $("hSub2").innerHTML = esc(t("errCheck", { link: "\u0000" })).replace("\u0000", link("linkName"));
   }
 }
+
+/* Static text and language */
+function applyLang(){
+  document.documentElement.lang = lang === "zh" ? "zh-Hans" : lang;
+  document.title = t("appName");
+  document.querySelectorAll("[data-t]").forEach(el => { el.textContent = t(el.dataset.t); });
+  document.querySelectorAll("[data-th]").forEach(el => { el.innerHTML = t(el.dataset.th); }); // trusted markup from i18n.js
+  document.querySelectorAll("[data-ta]").forEach(el => el.setAttribute("aria-label", t(el.dataset.ta)));
+  $("reportText").placeholder = t("reportPlaceholder");
+  document.querySelectorAll(".langs").forEach(g => {
+    g.innerHTML = Object.entries(I.LANGS).map(([k, v]) => `<button type="button" data-lang="${k}" aria-pressed="${k === lang}" lang="${k === "zh" ? "zh-Hans" : k}">${esc(v.label)}</button>`).join("");
+  });
+  $("footText").innerHTML = esc(t("footer", { link: "\u0000", date: dt(DATA.verifiedAt) })).replace("\u0000", link("linkName")) + ` · v${esc(APP_VERSION)}`;
+  setPlat(plat);
+  render();
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-lang]");
+  if (b) { lang = b.dataset.lang; store.set("lang", lang); applyLang(); }
+});
 
 /* How-to sheet */
 function platform(){
@@ -425,23 +666,23 @@ function platform(){
   if (/Android/.test(ua)) return "android";
   return "desktop";
 }
-const HOWTO = {
-  ios: `<ol><li>Open this page in <b>Safari</b>.</li><li>Tap <b>Share</b> (the square with an arrow).</li><li>Scroll down and tap <b>Add to Home Screen</b>, then <b>Add</b>.</li></ol>`,
-  android: `<ol><li>Open this page in <b>Chrome</b>.</li><li>Tap the <b>⋮</b> menu at the top right.</li><li>Tap <b>Add to Home screen</b>, then <b>Add</b>.</li></ol>`,
-  desktop: `<ol><li>In Chrome or Edge, click the <b>install icon</b> at the right end of the address bar, if you see one.</li><li>Or bookmark it: <b>⌘D</b> on Mac, <b>Ctrl+D</b> on Windows.</li></ol>`
-};
-function setPlat(p){ document.querySelectorAll(".plat button").forEach(b => b.setAttribute("aria-pressed", b.dataset.p === p)); $("howto").innerHTML = HOWTO[p]; }
-function openSheet(id){ $(id).hidden = false; const f = $(id).querySelector("button, a, textarea"); if (f) f.focus(); }
+const HOW = { ios: "howIos", android: "howAndroid", desktop: "howDesktop" };
+let plat = platform();
+function setPlat(p){ plat = p; document.querySelectorAll(".plat button").forEach(b => b.setAttribute("aria-pressed", b.dataset.p === p)); $("howto").innerHTML = t(HOW[p]); }
+function openSheet(id){ $(id).hidden = false; const f = $(id).querySelector("textarea, .primary, button"); if (f) f.focus(); }
 function closeSheet(id){ $(id).hidden = true; }
 const installed = window.navigator.standalone || (window.matchMedia && matchMedia("(display-mode: standalone)").matches);
 
-/* Report sheet */
+/* Report sheet: a description is required before anything can be sent. */
+const MIN_REPORT = 5;
+const reportOk = () => $("reportText").value.trim().length >= MIN_REPORT;
 function reportDetails(){
   const s = last || {};
   const nextTrip = s.kind === "live" ? L.fmt(s.trips[s.nextIdx][0]) : (s.next ? `${s.next.ymd} ${L.fmt(s.next.first)}` : "-");
   return [
     `App version: ${APP_VERSION}`,
     `Schedule data: ${DATA.dataVersion} (checked ${DATA.verifiedAt})`,
+    `Language: ${lang}`,
     `New York time: ${s.now ? s.now.ymd + " " + String(Math.floor(s.now.mins/60)).padStart(2,"0") + ":" + String(s.now.mins%60).padStart(2,"0") : "-"}`,
     `Device time: ${new Date().toString()}`,
     `Tab: ${viewKey}  Status: ${s.kind || "-"}  Next shown: ${nextTrip}`,
@@ -451,12 +692,38 @@ function reportDetails(){
   ].join("\n");
 }
 function refreshReport(){
-  const details = reportDetails();
-  $("reportLog").textContent = details;
-  const body = `**What happened**\n${$("reportText").value.slice(0, 2000) || "(not filled in)"}\n\n**Details**\n\`\`\`\n${details}\n\`\`\``;
-  $("reportGithub").href = `https://github.com/${REPO}/issues/new?title=${encodeURIComponent("Shuttle app problem")}&body=${encodeURIComponent(body)}`;
-  return body;
+  $("reportLog").textContent = reportDetails();
+  const ok = reportOk();
+  ["reportEmail", "reportGithub", "reportCopy"].forEach(id => $(id).classList.toggle("is-off", !ok));
+  if (ok) { $("reportText").removeAttribute("aria-invalid"); if ($("reportMsg").classList.contains("warn")) { $("reportMsg").textContent = ""; $("reportMsg").classList.remove("warn"); } }
 }
+function requireText(){
+  if (reportOk()) return true;
+  $("reportText").setAttribute("aria-invalid", "true");
+  $("reportMsg").textContent = t("needText"); $("reportMsg").classList.add("warn");
+  $("reportText").focus();
+  return false;
+}
+const reportPlain = () => `${t("whatHappened")}:\n${$("reportText").value.trim().slice(0, 2000)}\n\n${t("details")}:\n${reportDetails()}`;
+const reportMarkdown = () => `**What happened**\n${$("reportText").value.trim().slice(0, 2000)}\n\n**Details**\n\`\`\`\n${reportDetails()}\n\`\`\``;
+function say(key){ $("reportMsg").classList.remove("warn"); $("reportMsg").textContent = t(key); }
+
+$("reportEmail").addEventListener("click", () => {
+  if (!requireText()) return;
+  const to = MAIL_PARTS.join("@");
+  location.href = `mailto:${to}?subject=${encodeURIComponent(t("emailSubject"))}&body=${encodeURIComponent(reportPlain())}`;
+  say("emailOpened");
+});
+$("reportGithub").addEventListener("click", () => {
+  if (!requireText()) return;
+  const url = `https://github.com/${REPO}/issues/new?title=${encodeURIComponent("Shuttle app problem")}&body=${encodeURIComponent(reportMarkdown())}`;
+  window.open(url, "_blank", "noopener,noreferrer");
+});
+$("reportCopy").addEventListener("click", async () => {
+  if (!requireText()) return;
+  try { await navigator.clipboard.writeText(reportPlain()); say("copied"); }
+  catch (e) { $("reportLog").closest("details").open = true; const r = document.createRange(); r.selectNodeContents($("reportLog")); getSelection().removeAllRanges(); getSelection().addRange(r); say("copyFallback"); }
+});
 
 /* Wire up */
 document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => { viewKey = b.dataset.key; shown = 4; back = 0; render(); }));
@@ -468,22 +735,13 @@ document.querySelectorAll(".plat button").forEach(b => b.addEventListener("click
 $("openReport").addEventListener("click", () => { refreshReport(); openSheet("reportSheet"); });
 $("closeReport").addEventListener("click", () => closeSheet("reportSheet"));
 $("reportText").addEventListener("input", refreshReport);
-$("reportGithub").addEventListener("click", refreshReport);
-$("reportCopy").addEventListener("click", async () => {
-  const text = refreshReport();
-  try { await navigator.clipboard.writeText(text); $("copyMsg").textContent = "Copied. Paste it in a text or email to Lian."; }
-  catch (e) { $("reportLog").closest("details").open = true; const r = document.createRange(); r.selectNodeContents($("reportLog")); getSelection().removeAllRanges(); getSelection().addRange(r); $("copyMsg").textContent = "Select and copy the details above."; }
-});
 document.querySelectorAll(".scrim").forEach(s => s.addEventListener("click", e => { if (e.target === s) { if (s.id === "helpSheet") store.set("seenHelp", "1"); s.hidden = true; } }));
 document.addEventListener("keydown", e => { if (e.key === "Escape") document.querySelectorAll(".scrim").forEach(s => s.hidden = true); });
 document.addEventListener("visibilitychange", () => { if (!document.hidden) render(); });
 
-$("ver").textContent = APP_VERSION;
-$("verified").textContent = L.prettyDate(DATA.verifiedAt);
 viewKey = L.defaultKey(DATA, new Date());
-setPlat(platform());
-if (installed) $("installBlock").hidden = true;
-render();
+if (installed) { $("installedNote").hidden = false; plat = platform(); }
+applyLang();
 setInterval(render, 30000);
 if (!store.get("seenHelp")) openSheet("helpSheet");
 </script>
